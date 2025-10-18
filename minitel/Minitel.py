@@ -389,7 +389,7 @@ class Minitel:
 
         return retour
 
-    def definir_mode(self, mode = 'VIDEOTEX', page = True):
+    def definir_mode(self, mode = 'VIDEOTEX', rouleau = False):
         """Définit le mode de fonctionnement du Minitel.
 
         Le Minitel peut fonctionner selon 3 modes : VideoTex (le mode standard
@@ -405,9 +405,9 @@ class Minitel:
         :type mode:
             une chaîne de caractères
 
-        :param page:
-            True pour passer le Minitel en mode page (le curseur est téléporté en haut une fois en bas)
-            False pour le passer en mode rouleau (le curseur reste en bas et toute la page monte, inversement en haut)
+        :param rouleau:
+            True pour passer le Minitel en mode rouleau (le curseur reste en bas et toute la page monte, inversement en haut)
+            False pour le passer en mode page (le curseur est téléporté en haut une fois en bas)
 
         :type page:
             un booléen
@@ -419,11 +419,11 @@ class Minitel:
 
         # Si le mode de page demandé est déjà actif, ne fait rien
         # Au final soit le Minitel est en mode rouleau, soit il ne l'est pas (donc mode page)
-        if page != self.mode_page:
-            if page:
-                retour = self.appeler([PRO2, STOP, ROULEAU], LONGUEUR_PRO2)
-            else :
+        if rouleau != self.mode_page:
+            if rouleau:
                 retour = self.appeler([PRO2, START, ROULEAU], LONGUEUR_PRO2)
+            else :
+                retour = self.appeler([PRO2, STOP, ROULEAU], LONGUEUR_PRO2)
             if retour.longueur != LONGUEUR_PRO2:
                 return False
 
