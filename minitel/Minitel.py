@@ -16,7 +16,7 @@ from minitel.constantes import (SS2, SEP, ESC, CSI, PRO1, PRO2, PRO3, MIXTE1,
     RCPT_CLAVIER, ETEN, C0, MINUSCULES, RS, US, VT, LF, BS, TAB, CON, COF,
     AIGUILLAGE_ON, AIGUILLAGE_OFF, RCPT_ECRAN, EMET_MODEM, FF, CAN, BEL, CR,
     SO, SI, B300, B1200, B4800, B9600, REP, COULEURS_MINITEL,
-    CAPACITES_BASIQUES, CONSTRUCTEURS)
+    CAPACITES_BASIQUES, CONSTRUCTEURS, ROULEAU)
 
 def normaliser_couleur(couleur):
     """Retourne le numéro de couleur du Minitel.
@@ -122,6 +122,7 @@ class Minitel:
 
         # Initialise l’état du Minitel
         self.mode = 'VIDEOTEX'
+        self.mode_page = True
         self.vitesse = 1200
 
         # Initialise la liste des capacités du Minitel
@@ -388,7 +389,7 @@ class Minitel:
 
         return retour
 
-    def definir_mode(self, mode = 'VIDEOTEX'):
+    def definir_mode(self, mode = 'VIDEOTEX', page = True):
         """Définit le mode de fonctionnement du Minitel.
 
         Le Minitel peut fonctionner selon 3 modes : VideoTex (le mode standard
@@ -404,10 +405,27 @@ class Minitel:
         :type mode:
             une chaîne de caractères
 
+        :param page:
+            True pour passer le Minitel en mode page (le curseur est téléporté en haut une fois en bas)
+            False pour le passer en mode rouleau (le curseur reste en bas et toute la page monte, inversement en haut)
+
+        :type page:
+            un booléen
+
         :returns:
             False si le changement de mode n’a pu avoir lieu, True sinon.
         """
         assert isinstance(mode, str)
+
+        # Si le mode de page demandé est déjà actif, ne fait rien
+        # Au final soit le Minitel est en mode rouleau, soit il ne l'est pas (donc mode page)
+        if page != self.mode_page:
+            if page:
+                retour = self.appeler([PRO2, STOP, ROULEAU], 2)
+            else :
+                retour = self.appeler([PRO2, START, ROULEAU], 2)
+            if retour.longueur != LONGUEUR_PRO2:
+                return False
 
         # 3 modes sont possibles
         if mode not in ['VIDEOTEX', 'MIXTE', 'TELEINFORMATIQUE']:
@@ -1135,7 +1153,7 @@ class Minitel:
         self.envoyer([US, 0x41, 0x41])
 
         # Sélectionne le jeu de caractère fraîchement modifié (G’0 ou G’1)
-        if jeu == 'GO':
+        if jeu == 'G0':
             self.envoyer([ESC, 0x28, 0x20, 0x42])
         else:
             self.envoyer([ESC, 0x29, 0x20, 0x43])
