@@ -421,9 +421,9 @@ class Minitel:
         # Au final soit le Minitel est en mode rouleau, soit il ne l'est pas (donc mode page)
         if page != self.mode_page:
             if page:
-                retour = self.appeler([PRO2, STOP, ROULEAU], 2)
+                retour = self.appeler([PRO2, STOP, ROULEAU], LONGUEUR_PRO2)
             else :
-                retour = self.appeler([PRO2, START, ROULEAU], 2)
+                retour = self.appeler([PRO2, START, ROULEAU], LONGUEUR_PRO2)
             if retour.longueur != LONGUEUR_PRO2:
                 return False
 
