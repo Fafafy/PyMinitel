@@ -122,7 +122,7 @@ class Minitel:
 
         # Initialise l’état du Minitel
         self.mode = 'VIDEOTEX'
-        self.mode_page = True
+        self.mode_rouleau = False
         self.vitesse = 1200
 
         # Initialise la liste des capacités du Minitel
@@ -238,6 +238,9 @@ class Minitel:
         # Ajoute les caractères un par un dans la file d’attente d’envoi
         for valeur in contenu.valeurs:
             self.sortie.put(chr(valeur))
+
+        # La séquence ainsi générée est envoyée au Minitel
+        self.sortie.join()
 
     def recevoir(self, bloque = False, attente = None):
         """Lit un caractère en provenance du Minitel
@@ -371,9 +374,6 @@ class Minitel:
         # Envoie la séquence
         self.envoyer(contenu)
 
-        # Attend que toute la séquence ait été envoyée
-        self.sortie.join()
-
         # Tente de recevoir le nombre de caractères indiqué par le paramètre
         # attente avec un délai d’1 seconde.
         retour = Sequence()
@@ -419,7 +419,7 @@ class Minitel:
 
         # Si le mode de page demandé est déjà actif, ne fait rien
         # Au final soit le Minitel est en mode rouleau, soit il ne l'est pas (donc mode page)
-        if rouleau != self.mode_page:
+        if rouleau != self.mode_rouleau:
             if rouleau:
                 retour = self.appeler([PRO2, START, ROULEAU], LONGUEUR_PRO2)
             else :
